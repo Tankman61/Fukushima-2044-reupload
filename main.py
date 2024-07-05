@@ -1,27 +1,35 @@
+"""
+date: june 19th, 2023
+name: christine wei and william yang
+description: this is the program's mainline logic and calls all other files to start and display the game
+"""
 
-# IMPORTS
+# I - import
 import pygame
-
-import player
-import state
-
 import os
 import time
 
+import state
+
+# Set working directory to current directory so that it is easier to find files
 os.chdir(os.getcwd())
 
-# CLASSES
 
-
+# GAME CLASS
 class Game:
-    def __init__(self):
-        pygame.init()
+    """
+    this is the main game class, defining the game window and calling all other functions to allow the game to run
+    """
 
+    def __init__(self):
+        # Initialize
+        pygame.init()
+        # Display
         self.game_canvas = pygame.Surface((1080, 720))
         self.screen = pygame.display.set_mode((1080, 720))
         pygame.display.set_caption("Fukushima 2044")
-
-        # self.clock = pygame.time.Clock()
+        # Time
+        self.clock = pygame.time.Clock()
         self.keepGoing, self.playing = True, True
         self.actions = {"left": False,
                         "right": False,
@@ -33,19 +41,26 @@ class Game:
                         "Title": False,
                         "Game over": False,
                         "return": False, "Game won": False}
+
+        # Initialize delta time (dt) and prev_time
         self.dt, self.prev_time = 0, 0
 
+        # Create empty state stack
         self.state_stack = []
+
+        # Load the first state (Title state)
         self.load_states()
 
     def run(self):
         while self.keepGoing:
+            # A - Action / E - Events
             self.get_dt()
             self.get_events()
             self.update()
             self.render()
 
     def get_events(self):
+        # Events (key presses, mouse presses)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
@@ -93,15 +108,18 @@ class Game:
                     self.actions["return"] = False
 
     def update(self):
+        # R - REFRESH
         self.state_stack[-1].update(self.dt, self.actions)
 
     def render(self):
+        # RENDER THE GAME STATE
         self.state_stack[-1].render(self.screen)
-        # pygame.display.update()
+        # FPS / Clock
         pygame.display.flip()
-        # self.clock.tick(60)
+        self.clock.tick(60)
 
     def get_dt(self):
+        # time difference
         now = time.time()
         self.dt = now - self.prev_time
         self.prev_time = now
@@ -118,5 +136,6 @@ class Game:
             self.actions[action] = False
 
 
+# start the action
 game = Game()
 game.run()
